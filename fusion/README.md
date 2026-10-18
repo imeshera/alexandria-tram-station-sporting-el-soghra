@@ -51,9 +51,15 @@ Every script activates the document **by name** (`Sporting El Soghra Station`) b
 | 6 | `build_ocs.py` | Overhead Line |
 | 7 | `build_appearance.py` | Weathered appearances by body name |
 
-`build_all.py` runs them in order (`run(ctx, steps=[...])` for a subset). Helpers: `snap.py` (viewport image with
-an explicit camera, used for the renders and the photo overlay) and `save_doc.py` (save with a version message after
-checking project and folder).
+`build_all.py` runs them in order (`run(ctx, steps=[...])` for a subset). Other scripts:
+
+| Script | Does |
+|---|---|
+| `build_canvas.py` | `run(ctx, image='<photo>', key='IMG_3282')`: camera-matched photo canvas + named view for overlay checks |
+| `render_views.py` | Saves the standard views into `docs/renders/` |
+| `export_models.py` | Saves, deletes all canvases in memory, exports F3D + STEP into `models/`, closes without saving and reopens |
+| `snap.py` | Viewport image with an explicit camera |
+| `save_doc.py` | Save with a version message after checking project and folder |
 
 ## Changing the model
 Edit a user parameter in Fusion (*Modify → Change Parameters*) and re-run the scripts that use it (pavilion

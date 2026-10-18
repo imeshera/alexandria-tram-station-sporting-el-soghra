@@ -68,6 +68,22 @@ Decisions, measurements and Fusion API gotchas, in the order they happened.
 - The overlay also put the kerb ~1 m closer (pavement 1.8 m) and showed the stair parapets steeper than 31°: tread
   230 mm, foot moved to x = −3.1 m. The lower-flight parapet now coincides with the photo.
 
+## 2026-10-17 — Pass 2: scale render, underlay, exports
+- Scale render: the published STEP of Raml car 223 imported into the design (`importManager.importToTarget`), placed
+  with its cab at x = −1.5 m on the south track (its frame matches ours: X along the car, Y up from top of rail,
+  Z centred), rendered, then deleted. Car side 0.17 m from the platform edge; pantograph head just under the
+  5.80 m contact wire.
+- `build_canvas.py`: camera-matched canvas of IMG_3282 on a construction plane 70 m along the camera axis
+  (38.7 × 68.9 m), plus the named view *IMG_3282*. The plane is created with `setByPlane` inside a base feature
+  (`targetBaseOrFormFeature`), as a parametric design does not accept a free plane otherwise. The canvas
+  transform maps the unit image square to plane coordinates using the plane's own u/v directions.
+- Gotchas: `NamedViews.itemByName` raises when the name is missing; a canvas created earlier in a script that then
+  failed survived the rollback and `Canvas.deleteMe` refused to delete it ("Delete was unsuccessful") — removed by
+  rolling the timeline marker to it and `deleteAllAfterMarker` (safe only when it is the last item).
+- Exports (`export_models.py`): save, delete all canvases in memory, export F3D and STEP, close without saving and
+  reopen, so the stored design keeps its underlay and the published files carry no photo.
+- Rubble stones chunkier and rocked; darker stone pitching; grey dulled glass.
+
 ## Open questions
 - Building depth, canopy projection and stair geometry rest on one night photo and the satellite block; a tape
   measure on site would settle them (`references/notes/dimensions.md` §8).

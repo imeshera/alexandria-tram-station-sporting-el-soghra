@@ -45,6 +45,10 @@ def geom(p):
     g['xLW1'] = p.st_x - fl / 2 - run1                  # west half-landing, east edge
     g['xHL1'] = g['xLE0'] - run2                        # head landing east end
     g['xHL0'] = g['xLW1'] + run2                        # head landing west end
+    # stair footprint (for cutting the slope): landings + end parapets, out to the outer parapet
+    g['st_x0'] = g['xLW1'] - fl - p.st_para_t
+    g['st_x1'] = g['xLE0'] + fl + p.st_para_t
+    g['st_z1'] = g['zcrest'] + 3 * p.st_para_t + 2 * p.st_w
     return g
 
 
@@ -81,19 +85,24 @@ def embankment(pp, p, g):
         while s < slope_len - 10:
             zz = zt - cs * s
             yy = yst + sn * s
-            lx, ly, lz = rnd.uniform(18, 34), rnd.uniform(6, 11), rnd.uniform(14, 26)
-            ang = rnd.uniform(-0.5, 0.5)
-            c = (xx + rnd.uniform(-6, 6), yy + cs * 2.0, zz + sn * 2.0)
-            xd = (math.cos(ang), 0, math.sin(ang) * 0.3)
-            # second axis roughly along the slope normal
-            nrm = (0, cs, sn)
+            lx, ly, lz = rnd.uniform(20, 38), rnd.uniform(10, 18), rnd.uniform(16, 30)
+            ang = rnd.uniform(-0.6, 0.6)
+            tilt = rnd.uniform(-0.25, 0.25)
+            c = (xx + rnd.uniform(-7, 7), yy + cs * 3.0, zz + sn * 3.0)
+            xd = (math.cos(ang), math.sin(tilt) * 0.5, math.sin(ang) * 0.3)
+            # second axis roughly along the slope normal, rocked a little
+            nrm = (rnd.uniform(-0.2, 0.2), cs, sn + rnd.uniform(-0.2, 0.2))
             # make yd perpendicular to xd
             dot = xd[0] * nrm[0] + xd[1] * nrm[1] + xd[2] * nrm[2]
             yd = (nrm[0] - dot * xd[0], nrm[1] - dot * xd[1], nrm[2] - dot * xd[2])
             stones.append(pp.OB(c, xd, yd, lx, ly, lz))
-            s += rnd.uniform(20, 28)
-        xx += rnd.uniform(26, 34)
+            s += rnd.uniform(24, 32)
+        xx += rnd.uniform(30, 38)
     pp.add('Rubble stones', pp.merge(stones))
+    # the stair block replaces the slope in its footprint
+    cutter = pp.B(g['st_x0'], g['st_x1'], yst - 0.5, yb + 200, zc + 0.5, g['st_z1'] + 50)
+    for n in ('Earth fill', 'Stone pitching', 'Rubble stones'):
+        pp.cut_all(n, cutter)
     # pavement, kerb, road strip
     pw = p.pave_w
     pp.box('Pavement', x0, x1, yst - 40, yst, zt - 1, zt + pw)
