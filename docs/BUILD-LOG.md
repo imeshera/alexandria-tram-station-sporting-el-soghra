@@ -80,8 +80,17 @@ Decisions, measurements and Fusion API gotchas, in the order they happened.
 - Gotchas: `NamedViews.itemByName` raises when the name is missing; a canvas created earlier in a script that then
   failed survived the rollback and `Canvas.deleteMe` refused to delete it ("Delete was unsuccessful") — removed by
   rolling the timeline marker to it and `deleteAllAfterMarker` (safe only when it is the last item).
-- Exports (`export_models.py`): save, delete all canvases in memory, export F3D and STEP, close without saving and
-  reopen, so the stored design keeps its underlay and the published files carry no photo.
+- Exports (`export_models.py`): save, close and reopen the latest version, delete all canvases in memory, export
+  F3D and STEP, close without saving and reopen, so the stored design keeps its underlay and the published files
+  carry no photo.
+- **Gotcha:** the first export, made in the same session that created (and once failed to delete) the canvas,
+  still carried the photo (`FusionAssetName[Active]/Images.BlobParts/*.jpg`, byte-identical to IMG_3282) although
+  the canvas was gone. Deleting the canvas right after a fresh open of the saved version gives an archive without
+  images. Always check `unzip -l <f3d> | grep -iE '\.(jpe?g|png)'` before committing; the bad file was deleted
+  unpublished.
+- **Gotcha:** right after `doc.save()`, `doc.dataFile` still points at the previous version; reopening "the"
+  data file reopened v3 instead of v4. Wait for the upload and open `max(dataFile.versions)`.
+- STEP of the whole station is 84 MB (rubble stones, tile rolls, brick joints): shipped zipped (13 MB). F3D 37 MB.
 - Rubble stones chunkier and rocked; darker stone pitching; grey dulled glass.
 
 ## Open questions
